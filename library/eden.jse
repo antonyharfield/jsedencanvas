@@ -1,0 +1,102 @@
+##STRING FUNCTIONS
+
+func str {
+  ${{
+  var a = arguments[0];
+  return (new Number(a)).toString();
+  }}$;
+};
+
+func int {
+  ${{
+  var a = arguments[0];
+  return parseInt(a);
+  }}$;
+};
+
+
+##HTML Output
+func html {
+	${{
+	var text = arguments[0];
+	var me = $("#html-content");
+	me.html(text);
+	}}$;
+};
+
+
+##MISSING FUNCTIONS
+
+func eager {};
+
+func time {
+  ${{
+  var now = new Date();
+  return Math.floor(now.getTime() / 1000);
+  }}$;
+};
+
+func writeln {
+  ${{
+  var t = arguments[0];
+  //if (typeof(t) == "string") {
+	//t = t.replace(/\n/g,'<br>');
+  //}
+  console.log(t);
+  //var content = $("#tty-content");
+  //content.html(content.html()+t+"<br>");
+  //content.get(0).scrollTop = content.get(0).scrollHeight;
+  }}$;
+};
+
+func rand {
+  ${{
+	return Math.floor(Math.random()*32767);
+  }}$;
+};
+
+func srand {
+
+};
+
+func substr {
+
+};
+
+func forget {
+	${{
+	var o = arguments[0];
+	delete root.symbols[o];
+	}}$;
+};
+
+true = 1;
+false = 0;
+
+func include {
+${{
+Eden.executeFile(arguments[0]);
+printAllUpdates();
+}}$;
+};
+
+func execute {
+${{
+  try {
+	eval(Eden.translateToJavaScript(arguments[0]));
+  } catch(e) {
+	$('#error-window').addClass('ui-state-error').append("<div class=\"error-item\"># ERROR number " + eden.errornumber + ":<br># Execute<br>" + e.message + "</div>\r\n\r\n").dialog({title:"EDEN Errors"});
+				eden.errornumber = eden.errornumber + 1;
+  }
+}}$;
+};
+
+
+
+##Include the rest of the library
+
+include("library/drawing.jse");
+include("library/maths.jse");
+include("library/pagemeta.jse");
+include("library/inputs.jse");
+include("library/algebra.jse");

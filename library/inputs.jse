@@ -1,0 +1,17 @@
+${{
+console.log("here");
+	$('#canvas').mousemove(function(e) {
+	console.log("here");
+		var canvas = $('#canvas');
+		root.lookup('mouseX').assign(e.pageX);
+		root.lookup('mouseY').assign(e.pageY);
+	});
+}}$;
+
+${{
+	$('body').delegate("#canvas", "click", function(e) {
+		var canvas = $('#canvas');
+		root.lookup('mouseClickX').assign(e.pageX-parseInt(canvas.css("left")));
+		root.lookup('mouseClickY').assign(e.pageY-parseInt(canvas.css("top")));
+	});
+}}$;
