@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+     "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Getting Started with JS Eden Canvas</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link rel="stylesheet" href="css/normalize.css">
+	<style>
+	body { margin: 10px; font-size:90% }
+	pre { font-size: 80% }
+	</style>
+<body>
+
+<h1>Getting Started with JS Eden Canvas</h1>
+
+<hr/>
+
+<div>			
+
+<p>This guide will give you an introduction to JS Eden, the web variant of tkeden.</p>
+
+<h2>Starting JS Eden</h2>
+
+<p>There are several different flavours of JS Eden, but the one you will use today is JS Eden Canvas which is available at:</p>
+
+<p><a href="http://harfield.org.uk/jsedencanvas/">http://harfield.org.uk/jsedencanvas/</a></p>
+
+<p><em>Disclaimer: JS Eden is a &quot;work in progress&quot; so be aware that some/all models have bugs/problems. </em></p>
+
+<p>The first thing that you will notice is there are 3 parts to the screen. On the left is the observable list. On the right is the canvas, and below this the Eden input box.</p>
+
+<p>Let's get started, so type in the input box:</p>
+
+<pre>a = 5;<br />b = 6;</pre>
+<p>Then click on 'Execute'. To inspect the value of a and b, you can view the values of all observables in the left hand panel:</p>
+
+<p><img src="img/observables-ab.png" /></p>
+
+<p>You can change observables at any time. <em>(1) Can you change the value of a to be 7?</em></p>
+
+<h2>Dependency</h2>
+
+<p>Create a new observable called c:</p>
+<pre>c = a + b;</pre>
+<p>The observable c should now have the value of a+b. There is another way of calculating a+b, using dependency:</p>
+<pre>d is a + b;</pre>
+<p>Now c and d should have the same value. Try changing the value of a:</p>
+<pre>a = 1;</pre>
+<p><em>Are c and d still the same?</em> They are not, because d has changed. It has updated to maintain the 'dependency' of d is a+b. In JS Eden, 'is' is used to create dependencies between observables, much like the dependencies between cells in a spreadsheet.</p>
+<p><em>(2) Can you create a new observable called 'doubleA' which is always twice as big as 'a'?</em></p>
+
+
+<h2>Canvas</h2>
+
+<p>The next thing you might notice is the &quot;canvas&quot; that is currently an empty white space. This will be the main focus of our exploration.</p>
+
+<p><strong>To add a line:</strong></p>
+
+<pre>myLine is Line(0,0,50,100);<br />canvas is [myLine];</pre>
+
+<p>The first part creates the line observable, with the parameters x1, y1, x2, y2 representing the two points between which the straight line is drawn.</p>
+
+<p>The second part defines the <code>canvas</code> observable as a list containing the line observable. (Without this, you would not see the line in the your browser.)</p>
+
+<p><strong>Modify the line:</strong></p>
+
+<pre>myLine is Line(10,100,10+a,100);</pre>
+<p>Now the line is dependent on the value of the observable &quot;a&quot;. <em>(3) What happens when you change 'a'?</em></p>
+
+<p><strong>Line colour:</strong></p>
+
+<pre>col is &quot;red&quot;;<br />myLine is Line(10,100,10+a,100,col);</pre>
+<p>In JS Eden you are free to define and redefine observables whenever you like. <em>(4) Can you change the colour of the line to blue?</em></p>
+
+<h2>Mouse observables</h2>
+
+<p>Take a look at the Observables panel on the left again. &quot;Woh, there is some stuff in there I didn't write!&quot; Yes, for example, &quot;mouseX&quot; and &quot;mouseY&quot; are 2 observables that are provided by JS Eden and they correspond to the mouse pointer position in the canvas. Try this:<br />
+  </p>
+
+<pre>myLine is Line(0,0,mouseX,mouseY);</pre>
+<p>There are another 2 observables for the last position of the mouse click (&quot;mouseClickX&quot;), and another observable for the current state of the mouse (&quot;mousePressed&quot;).</p>
+
+<p><em>(5) Can you make the line turn red when the mouse button is being pressed?</em></p>
+
+<p>(Hint: You can write &quot;inline if&quot; expressions of the form [bool] ? [true_value] : [false_value].)</p>
+
+<p><emp>(6) Can you modify the line so that the origin moves to the position of the last mouse click?</em></p>
+
+
+<h2>Shapes</h2>
+
+<p>There are several different shape type observables you can create.</p>
+
+<p><strong>To make a circle:</strong></p>
+
+<pre>myCircle is Circle(100,100,50);</pre>
+<p>The minimum parameters for a Circle consist of x, y, radius. Then add it to the canvas observable:</p>
+
+<pre>canvas is [myLine, myCircle];</pre>
+<p>There are 2 optional parameters for Circle: fill colour and outline colour. Try this:</p>
+
+<pre>myCircle is Circle(mouseClickX, mouseClickY, 50, &quot;orange&quot;, &quot;black&quot;);</pre>
+
+<p><em>(7) Draw a vertical line down the middle of the canvas. If the user moves the circle to the left side of the browser then it should show a yellow circle. If they move to the right then it should be a green circle.</em></p>
+
+<p><strong>To make a rectange:</strong></p>
+
+<pre>myRect is Rectangle(20,20,220,100);</pre>
+<p>You will also need to add the rectangle to the canvas (&quot;canvas is [...]&quot;). The minimum parameters for a rectangle are x, y, width and height. Rectangle has 2 optional parameters which are similar to the Circle properties: fill colour and outline colour.</p>
+
+<!--
+<h2>Triggered actions</h2>
+
+<p>In the above examples we were working with dependencies. A &quot;triggered action&quot; (also known as a triggered procedure) is a common EDEN construct and it is also available in JS-EDEN:</p>
+
+<pre>proc myTrigger : observable {<br />   // the observable has changed<br />}</pre>
+<p>Consider the rectangle and the circle again:</p>
+
+<pre>rectFill = &quot;clear&quot;;<br />myRect is Rectangle(20,20,220,200,rectFill,&quot;black&quot;);<br />myCircle is Circle(mouseClickX,mouseClickY,50,&quot;orange&quot;,&quot;black&quot;);<br />picture is [myRect,myCircle];</pre>
+<p>Task: Create a new observable called isInRectangle which is true if and only if the circle is inside the rectangle. Then write a triggered action that changes the rectFill to &quot;red&quot; when isInRectange is true.</p>
+
+<p>Hint: You can access the coordinates of the rectange as follows:</p>
+
+<pre>isInRectange is myCircle.x &gt; myRect.x1 &amp;&amp; ...</pre>
+-->
+
+<h2>Text and Divs</h2>
+
+<p>There are 2 types of observable for putting text on the canvas. The first is Text:</p>
+
+<pre>myText is Text(&quot;Hello folks&quot;,50,50,&quot;red&quot;);</pre>
+<p>Parameters: text, x, y, text colour.</p>
+
+<p>We can make the text dependent on a string:</p>
+
+<pre>myText is Text(label,50,50,&quot;red&quot;);<br/>label = &quot;I am a label&quot;;</pre>
+
+<p>So now we can change the label:</p>
+
+<pre>label = &quot;Put the circle in the rectangle!&quot;;</pre>
+
+<p>And we can make the label a dependency:</p>
+
+<pre>label is mouseClickX &lt; 200 &amp;&amp; mouseClickY &lt; 100 ? &quot;Well done!&quot; : &quot;Put the circle in the rectangle!&quot;;</pre>
+
+<p>The Text observable is for simple labels. For richer text there is the Div:</p>
+
+<pre>myDiv is Div(&quot;myDiv&quot;, 0, 100, 300, 200, &quot;&lt;h1&gt;Title&lt;/h1&gt;&lt;p&gt;Some text&lt;/p&gt;&quot;, &quot;&quot;);</pre>
+<p>Parameters: name, x, y, width, height, html, style.</p>
+
+<h2>Buttons</h2>
+
+<p>With Text and Divs we started moving away from drawing towards user interface components. Here are some others.</p>
+
+<p><strong>To create a button:</strong></p>
+
+<pre>myButton is Button(&quot;myButton&quot;,&quot;Press me&quot;,50,300,true);</pre>
+<p>Parameters: name, text, x, y, enabled</p>
+
+<p>The first parameter name is required because when there is user interaction with a button then it will update an observable. In the above example, the name is &quot;myButton&quot; and so when the user clicks the button there is an observable &quot;myButton_clicked&quot; that is updated. This means we can write a trigger:</p>
+
+<pre>proc myButtonAction : myButton_clicked {<br />   label = &quot;Button was clicked!&quot;;<br />}</pre>
+
+<!--
+<p><strong>To create a slider:</strong></p>
+
+<pre>mySlider is Slider(&quot;mySlider&quot;,0,200,1,0,0,10,400);</pre>
+<p>Parameters: name, min, max, step, value, orientation, x, y</p>
+
+<p>After adding the slider to the canvas, move the slider and take a look at the observables panel. You should see &quot;mySlider_value&quot; being updated as you move the slider.</p>
+
+<p>Task: Create a circle whose radius is dependent on the value of a slider. Or, more difficult, create a line where the direction is dependent on a slider that ranges from 0 to 360 (degrees).</p>
+
+<p><strong>Other drawables</strong></p>
+
+<p>There are other drawable observable types and you can find out their names and parameters from the Drawable panel on the left:</p>
+
+<p><img border="0" alt="jseden-drawables" class="ishadow16 corner" src="jseden-drawables.png" /></p>
+
+<p>Some of these are special to Emile (e.g. Vector, Matrix, Plane). Others might take some experimentation to find out what they do.</p>
+
+<h2>Injecting Javascript</h2>
+
+<p>The final thing to mention is that JS Eden is of course built on Javascript and therefore it is possible to access the underlying Javascript engine (and hence the full DOM!) from your EDEN script. For a simple example, let's insert some Javascript into a triggered action:</p>
+
+<pre>proc myButtonAction : myButton_clicked {<br />   myText = Text(&quot;Button was clicked&quot;,50,50,&quot;red&quot;);<br />   ${{<br />      alert(&quot;Button was clicked&quot;);<br />   }}$;<br />}<br /></pre>
+<p>The code inside ${{ }}$ is Javascript.</p>
+-->
+
+<h2>More exercises</h2>
+
+<p><em>(8) Can you make a game for children that contains 4 circles and 1 rectangle? Two circles are blue and two circles are red. Use dependency to make the rectangle change colour to yellow if the rectangle contains 2 circles of the same colour.</em></p>
+<p><em>(9) Can you make a plan of your bedroom including a bed, a table, chairs, windows and doors? Use dependency so that the plan resizes to the size of the canvas.</em></p>
+<p><em>(10) Can you make a multiple choice quiz containing 3 questions? Use dependency to show when the user has answered correctly or incorrectly.</em></p>
+
+</div>
+
+<hr/>
+
+</body>
+</html>

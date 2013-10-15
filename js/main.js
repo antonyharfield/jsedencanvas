@@ -8,13 +8,16 @@ $(document).ready(function(){
 
 	initialiseEden();
 	
-    // Set height
+	// Add error win
+	$('<pre id="error-window" style="font-family:monospace;"></pre>').appendTo($('body'));
+	
+    // Set height/width
 	resizeContent();
 	$(window).resize(function(){ resizeContent(); });
-	
+
 	// Set CodeMirror
 	inputBox = CodeMirror($('#inputbox').get(0), {
-	  value: "myCirc is Circle(canvas_width/2, canvas_height/2, canvas_height/3, \"red\", \"clear\");\ncanvas is [myCirc];",
+	  value: "",
 	  mode:  "eden"
 	});
 	
@@ -43,9 +46,22 @@ $(document).ready(function(){
 	$("#observable-search").keyup(function() {
 		printObservables(this.value);
 	});
+
+	// Set up buttons
+	$('#layoutButton').click(toggleSlides);
+	$('#resetButton').click(function() {
+		initialiseEden();
+		resizeContent();
+		eval(Eden.translateToJavaScript("canvas is []; slides is [];"));
+	});
 	
-	initialiseCanvas();
- });
+	// Load existing model
+	eden.loadLocalModelState();
+	
+	// Save model state every 10 seconds
+	setInterval(function() { eden.saveLocalModelState(); }, 10000);
+
+});
 
 
 
@@ -53,8 +69,9 @@ function resizeContent() {
 	var fullHeight = $(window).height() - $('#header').height();
     $('#sidebar').css({'height':(fullHeight)+'px'});
 
-	var canvasHeight = fullHeight - $('#input').height()-3*$('#verticalhandler').height();
+	var canvasHeight = fullHeight - $('#input').height()-3*$('#verticalhandler').height()-4;
 	$('#canvas').css({'height':(canvasHeight)+'px'});	
+	$('#slides').css({'height':(canvasHeight)+'px'});	
 	
 	var canvasWidth = $('#canvas').get(0).clientWidth;
 	$('#d1canvas').get(0).height = canvasHeight;
@@ -77,37 +94,8 @@ function initialiseEden() {
 	
 	// Global update (anything changes)
 	root.addGlobal(function (sym, create) {
-		if (create) {
-			printObservables($("#observable-search").val());
-			return;
-		}
-		
-		var me = $("#sbobs_"+sym.name.substr(1));
-		if (me === undefined) { return; }
-		
-		var namehtml;
-		if (sym.definition !== undefined) {
-			namehtml = "<span class=\"hasdef_text\">"+sym.name.substr(1)+"</span>";
-		} else {
-			namehtml = sym.name.substr(1);
-		}
-
-		var val = sym.value();
-		var valhtml;
-		if (typeof val == "boolean") { valhtml = "<span class='special_text'>"+val+"</span>"; }
-		else if (typeof val == "undefined") { valhtml = "<span class='error_text'>undefined</span>"; }
-		else if (typeof val == "string") { valhtml = "<span class='string_text'>\""+val+"\"</span>"; }
-		else if (typeof val == "number") { valhtml = "<span class='numeric_text'>"+val+"</span>"; }
-		else { valhtml = val; }
-
-		me.html("<li class=\"type-observable\">" + namehtml + "<span class='result_value'> = " + valhtml + "</span></li>");
-		
+		printObservables($("#observable-search").val());
 	});
-	
-	printObservables('');
-	
-	// Add error win
-	$('<pre id="error-window" style="font-family:monospace;"></pre>').appendTo($('body'));
 }
 
 function loadHistoryPrevious() {
@@ -144,14 +132,14 @@ function printObservables(pattern) {
 }
 
 
+function toggleSlides() {
+	$('#slides, #canvas').toggleClass('half');
+	$(this).toggleClass('selected');
+	resizeContent();
+}
 
-function initialiseCanvas() {
-	$('#canvas').mousemove(function(e) {
-			root.lookup('mouseX').assign(e.pageX-parseInt($('#content').css('margin-left')));
-			root.lookup('mouseY').assign(e.pageY-parseInt($('#content').css('margin-top'))-parseInt($('#header').css('height')));
-	});
-	$('#canvas').click(function(e) {
-			root.lookup('mouseClickX').assign(e.pageX-parseInt($('#content').css('margin-left')));
-			root.lookup('mouseClickY').assign(e.pageY-parseInt($('#content').css('margin-top'))-parseInt($('#header').css('height')));
-	});
+function showSlides() {
+	$('#slides, #canvas').addClass('half');
+	$('#layoutButton').addClass('selected');
+	resizeContent();	
 }

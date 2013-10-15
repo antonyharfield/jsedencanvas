@@ -1,3 +1,9 @@
+Copyright (c) Empirical Modelling Research Group, University of Warwick
+
+This software has been developed by members of the Empirical Modelling Research
+Group in the Department of Computer Science at the University of Warwick.
+
+
 Copyright (c) HTML5 Boilerplate
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

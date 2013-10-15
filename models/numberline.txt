@@ -1,0 +1,150 @@
+leftMargin = 50;
+topMargin = 140;
+numberlineWidth = 480;
+
+value = 0;
+sign = "<";
+
+/* Draw the numberline */
+numberline is Line(leftMargin, topMargin, leftMargin+numberlineWidth, topMargin, "black");
+dashm6 is Line(leftMargin, topMargin+10, leftMargin, topMargin, "black");
+dashm5 is Line(leftMargin+(numberlineWidth/12), topMargin+10, leftMargin+(numberlineWidth/12), topMargin, "black");
+dashm4 is Line(leftMargin+(2*numberlineWidth/12), topMargin+10, leftMargin+(2*numberlineWidth/12), topMargin, "black");
+dashm3 is Line(leftMargin+(3*numberlineWidth/12), topMargin+10, leftMargin+(3*numberlineWidth/12), topMargin, "black");
+dashm2 is Line(leftMargin+(4*numberlineWidth/12), topMargin+10, leftMargin+(4*numberlineWidth/12), topMargin, "black");
+dashm1 is Line(leftMargin+(5*numberlineWidth/12), topMargin+10, leftMargin+(5*numberlineWidth/12), topMargin, "black");
+dash0 is Line(leftMargin+(6*numberlineWidth/12), topMargin+10, leftMargin+(6*numberlineWidth/12), topMargin, "black");
+dash1 is Line(leftMargin+(7*numberlineWidth/12), topMargin+10, leftMargin+(7*numberlineWidth/12), topMargin, "black");
+dash2 is Line(leftMargin+(8*numberlineWidth/12), topMargin+10, leftMargin+(8*numberlineWidth/12), topMargin, "black");
+dash3 is Line(leftMargin+(9*numberlineWidth/12), topMargin+10, leftMargin+(9*numberlineWidth/12), topMargin, "black");
+dash4 is Line(leftMargin+(10*numberlineWidth/12), topMargin+10, leftMargin+(10*numberlineWidth/12), topMargin, "black");
+dash5 is Line(leftMargin+(11*numberlineWidth/12), topMargin+10, leftMargin+(11*numberlineWidth/12), topMargin, "black");
+dash6 is Line(leftMargin+(12*numberlineWidth/12), topMargin+10, leftMargin+(12*numberlineWidth/12), topMargin, "black");
+
+/* Add labels to the line */
+textm6 is Text("-6", leftMargin-7, topMargin+30);
+textm5 is Text("-5", leftMargin+(numberlineWidth/12)-7, topMargin+30);
+textm4 is Text("-4", leftMargin+(2*numberlineWidth/12)-7, topMargin+30);
+textm3 is Text("-3", leftMargin+(3*numberlineWidth/12)-6, topMargin+30);
+textm2 is Text("-2", leftMargin+(4*numberlineWidth/12)-6, topMargin+30);
+textm1 is Text("-1", leftMargin+(5*numberlineWidth/12)-6, topMargin+30);
+text0 is Text("0", leftMargin+(6*numberlineWidth/12)-4, topMargin+30);
+text1 is Text("1", leftMargin+(7*numberlineWidth/12)-4, topMargin+30);
+text2 is Text("2", leftMargin+(8*numberlineWidth/12)-4, topMargin+30);
+text3 is Text("3", leftMargin+(9*numberlineWidth/12)-4, topMargin+30);
+text4 is Text("4", leftMargin+(10*numberlineWidth/12)-4, topMargin+30);
+text5 is Text("5", leftMargin+(11*numberlineWidth/12)-4, topMargin+30);
+text6 is Text("6", leftMargin+(12*numberlineWidth/12)-4, topMargin+30);
+
+/* Add arrow and circle */
+circleFill is (sign=="<" || sign==">") ? "white" : "blue";
+lineX1 is leftMargin+((value+6)*numberlineWidth/12);
+lineX2 is (sign=="<" || sign=="<=") ? leftMargin : leftMargin+numberlineWidth;
+lineArrow is Line(lineX1, topMargin-20, lineX2, topMargin-20, "blue");
+lineArrowHead1 is Line(lineX2, topMargin-20, (sign==">" || sign==">=") ? lineX2-8 : lineX2+8, topMargin-28, "blue");
+lineArrowHead2 is Line(lineX2, topMargin-20, (sign==">" || sign==">=") ? lineX2-8 : lineX2+8, topMargin-12, "blue");
+circle is Circle(lineX1, topMargin-20, 10, circleFill, "blue");
+
+canvas is [
+numberline,
+dashm6,	dashm5,	dashm4,	dashm3,	dashm2, dashm1, dash0, dash1, dash2, dash3, dash4, dash5, dash6,
+textm6,	textm5,	textm4,	textm3,	textm2,	textm1, text0, text1, text2, text3, text4, text5, text6];
+
+
+slides is [s0, s1, s2, s3, s4, s5, s6, s7];
+
+s0 is Slide("<h3>Exploring the number line</h3><p>On the canvas is a number line from -6 to 6.</p><p>The number line is a line with a width. The current value of the line is "//str(numberlineWidth)//". To change the width, type a new value in the input box below. For example:</p>
+<pre>numberlineWidth is 200;</pre>
+<p>Or you can make the numberlineWidth relate to the canvas width:</p>
+<pre>numberlineWidth is canvas_width-100;</pre>
+<p>Try resizing the window!</p>
+<p>To reset the numberlineWidth back to 480:</p>
+<pre>numberlineWidth is 480;</pre>
+<p><i>Continue to the next page...</i></p>");
+
+s1 is Slide("<p>Another two observables are: topMargin and leftMargin. Try changing topMargin:</p>
+<jseden>topMargin is 10;</jseden>
+<p style=\"color:red\">Q1. What happens when you change leftMargin?</p>
+</hr/>
+<p>Remember that we have two observables called mouseClickX and mouseClickY. Try this:</p>
+<jseden>
+topMargin is mouseClickY;
+leftMargin is mouseClickX;
+</jseden>
+<p style=\"color:red\">Q2. What happens when you click on the canvas?</p>
+</hr/>
+<p>Or you could do something really weird:</p>
+<jseden>
+topMargin is mouseY;
+leftMargin is mouseX;
+</jseden>
+<p>If this is annoying then you can reset it:</p>
+<jseden>
+topMargin is 140;
+leftMargin is 50;
+</jseden>
+");
+
+s2 is Slide("<p>Let's add a circle and an arrow to the number line:</p>
+<jseden>
+canvas is [
+numberline,
+lineArrow, lineArrowHead1, lineArrowHead2, circle, 
+dashm6,	dashm5,	dashm4,	dashm3,	dashm2, dashm1, dash0, dash1, dash2, dash3, dash4, dash5, dash6,
+textm6,	textm5,	textm4,	textm3,	textm2,	textm1, text0, text1, text2, text3, text4, text5, text6];
+</jseden>
+<p>You can change the position of the circle:</p>
+<jseden>
+value is 4;
+</jseden>
+<p style=\"color:red\">Q3. How would you change the circle to be at -2?</p>
+</hr/>
+");
+
+s3 is Slide("<p>You can also change if the circle is filled or empty:</p>
+<pre>sign is \"<=\";</pre>
+<p>And change it back:</p>
+<pre>sign is \"<\";</pre>
+<p style=\"color:red\">Q4. How can you change the direction of the arrow?</p>
+<p>When the arrow is pointing right, let's continue to the next page...</p>");
+
+s4 is Slide("
+<p>Quick review...<p>
+<p>Change the position of the circle with value:</p>
+<pre>value is 0;</pre>
+<p>Change the circle fill and arrow direction with sign:</p>
+<pre>sign is \"<\";
+sign is \">\";
+sign is \"<=\";
+sign is \">=\";</pre>
+");
+
+s5 is Slide("
+<p>Create a new Text label:<p>
+<jseden>leftText is Text(\"Left\", 100, 200, \"black\");</jseden>
+<p>Now add it to the canvas:</p>
+<jseden>
+canvas is [
+numberline,
+lineArrow, lineArrowHead1, lineArrowHead2, circle, 
+dashm6,	dashm5,	dashm4,	dashm3,	dashm2, dashm1, dash0, dash1, dash2, dash3, dash4, dash5, dash6,
+textm6,	textm5,	textm4,	textm3,	textm2,	textm1, text0, text1, text2, text3, text4, text5, text6,
+leftText];
+</jseden>
+<p style=\"color:red\">Q5. How do you change the colour of the text to red?</p>
+");
+
+s6 is Slide("<p>Let's try to make our label red when the arrow is left.</p>
+<jseden>leftTextColour is \"red\";
+leftText is Text(\"Left\", 100, 200, leftTextColour);</jseden>
+<p>Now trying changing:</p>
+<jseden>leftTextColour is \"blue\";</jseden>
+<p>Try this:</p>
+<pre>leftTextColour is (sign==\"<\"||sign==\"<=\") ? \"red\" : \"black\";</pre>
+<p style=\"color:red\">Q6. What happens to Left when you change sign?</p>
+");
+
+s7 is Slide("<p>Open question: Can you make Text for Left, Right, Filled and Empty, and show them red when they are active?</p>
+<p>Ask Aj Ant for help!</p>");
+
+showSlides();

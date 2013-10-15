@@ -1,17 +1,16 @@
 ${{
-console.log("here");
 	$('#canvas').mousemove(function(e) {
-	console.log("here");
-		var canvas = $('#canvas');
-		root.lookup('mouseX').assign(e.pageX);
-		root.lookup('mouseY').assign(e.pageY);
+			root.lookup('mouseX').assign(e.pageX-parseInt($('#content').css('margin-left')));
+			root.lookup('mouseY').assign(e.pageY-parseInt($('#content').css('margin-top'))-parseInt($('#header').css('height')));
 	});
-}}$;
-
-${{
-	$('body').delegate("#canvas", "click", function(e) {
-		var canvas = $('#canvas');
-		root.lookup('mouseClickX').assign(e.pageX-parseInt(canvas.css("left")));
-		root.lookup('mouseClickY').assign(e.pageY-parseInt(canvas.css("top")));
+	$('#canvas').click(function(e) {
+			root.lookup('mouseClickX').assign(e.pageX-parseInt($('#content').css('margin-left')));
+			root.lookup('mouseClickY').assign(e.pageY-parseInt($('#content').css('margin-top'))-parseInt($('#header').css('height')));
+	});
+	$('#canvas').mousedown(function(e) {
+			root.lookup('mouseDown').assign(1);
+	});
+	$('#canvas').mouseup(function(e) {
+			root.lookup('mouseDown').assign(0);
 	});
 }}$;

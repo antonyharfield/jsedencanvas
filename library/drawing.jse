@@ -9,12 +9,13 @@ Line = function(x1, y1, x2, y2, colour) {
 }}$;
 
 ${{
-Rectangle = function(x1, y1, x2, y2, colour) {
-  this.x1 = x1;
-  this.y1 = y1;
-  this.x2 = x2;
-  this.y2 = y2;
-  this.colour = colour;
+Rectangle = function(x, y, width, height, fillcolour, outlinecolour) {
+  this.x = x;
+  this.y = y;
+  this.width = width;
+  this.height = height;
+  this.fillcolour = fillcolour;
+  this.outlinecolour = outlinecolour;
 }
 }}$;
 
@@ -64,13 +65,15 @@ func Line { ${{
 }}$; };
 
 func Rectangle { ${{
-  var x1 = arguments[0];
-  var y1 = arguments[1];
-  var x2 = arguments[2];
-  var y2 = arguments[3];
-  var colour = arguments[4];
-  if (colour === undefined) { colour = "black"; }
-  return new Rectangle(x1, y1, x2, y2, colour);
+  var x = arguments[0];
+  var y = arguments[1];
+  var width = arguments[2];
+  var height = arguments[3];
+  var fillcolour = arguments[4];
+  var outlinecolour = arguments[5];
+  if (fillcolour === undefined) { fillcolour = "clear"; }
+  if (outlinecolour === undefined) { outlinecolour = "black"; }
+  return new Rectangle(x, y, width, height, fillcolour, outlinecolour);
 }}$; };
 
 func Polygon { ${{
@@ -86,8 +89,8 @@ func Circle { ${{
   var radius = arguments[2];
   var fillcolour = arguments[3];
   var outlinecolour = arguments[4];
-  if (fillcolour == null) { fillcolour = "black"; }
-  if (outlinecolour == null) { outlinecolour = "black"; }
+  if (fillcolour == undefined) { fillcolour = "clear"; }
+  if (outlinecolour == undefined) { outlinecolour = "black"; }
   return new Circle(x, y, radius, fillcolour, outlinecolour);
 }}$; };
 
@@ -109,13 +112,15 @@ Line.prototype.toString = function() {
 
 ${{
 Rectangle.prototype.draw = function(context) {
-  context.fillStyle = this.colour;
-  context.fillRect(this.x1,this.y1,this.x2,this.y2);
+  context.fillStyle = this.fillcolour;
+  context.fillRect(this.x,this.y,this.width,this.height);
+  context.strokeStyle = this.outlinecolour;
+  context.strokeRect(this.x,this.y,this.width,this.height);
 };
 }}$;
 ${{
 Rectangle.prototype.toString = function() {
-  return "Rectangle(" + this.x1 + ", " + this.y1 + ", " + this.x2 + ", "+this.y2+", "+this.colour+")";
+  return "Rectangle(" + this.x + ", " + this.y + ", " + this.width + ", "+this.height+", "+this.fillcolour+", "+this.outlinecolour+")";
 };
 }}$;
 
@@ -185,9 +190,9 @@ proc cleanupCanvas { ${{
   });
 }}$; };
 
-canvas = [];
+canvas is [];
 
-proc drawCanvas : canvas { 
+proc drawCanvas : canvas, canvas_width, canvas_height { 
   clearCanvas();
   ${{
   var picture = context.lookup('canvas').value();
@@ -359,43 +364,43 @@ func Div { ${{
 ${{
 Div.prototype.draw = function(context) {
   var me = "canvas_" + this.name;
-  var me2 = this.name;
-  var but = $("#"+me).get(0);
+  var div = $("#"+me);
 
-  if (but === undefined) {
-	var dis = "";
-	if (this.enabled == true) { dis = ""; }
-	else { dis = "disabled=\"true\""; }
+  if (div.get(0) === undefined) {
+    // Set up style
+    var divstyle = "position: absolute; left: " + this.x + "px; top: " + this.y + "px; width: " + this.width + "px; height: " + this.height + "px; ";
+    if (this.style !== undefined) {
+      divstyle = divstyle + this.style;
+    }
 
+    // Create new element and add to canvas
 	var can = $("#canvas");
-	var divstyle = "position: absolute; left: " + this.x + "px; top: " + this.y + "px; width: " + this.width + "px; height: " + this.height + "px;";
-	if (this.style !== undefined) {
-		divstyle = divstyle + this.style;
+	var divhtml = $("<div id=\"" + me + "\" style=\""+divstyle+"\">" + this.html + "</div>").appendTo(can);
+
+	divhtml.get(0).togarbage = false; // Not sure what this does! (Ant)
+  }
+  else {
+    // Update content
+	div.html(this.html);
+	div.get(0).togarbage = false;
+	// Update position/size
+	div.css("width", "" + this.width + "px");
+	div.css("height", "" + this.height + "px");
+	div.css("left", "" + this.x + "px");
+	div.css("top", "" + this.y + "px");
+	// Update style
+	var properties = this.style.split(";");
+	for (var i=0; i<properties.length; i++) {
+	  var prop = properties[i].trim().split(":");
+	  if (prop.length == 2)
+	    div.css(prop[0].trim(), prop[1].trim());
 	}
-	var buthtml = $("<div id=\"" + me + "\" style=\""+divstyle+"\">" + this.html + "</div>").appendTo(can);
-
-	//.click(function() {
-	//	root.lookup(me2 + "_clicked").assign(true); root.lookup(me2 + "_clicked").assign(false);
-	//}).appendTo(can);
-
-	buthtml.get(0).togarbage = false;
-
-	//Initialise
-	//root.lookup(me2 + "_clicked").assign(false);
-  } else {
-	//but.value = this.label;
-	but.innerHTML = this.html;
-	but.togarbage = false;
-	but.style.width = "" + this.width + "px";
-	but.style.height = "" + this.height + "px";
-	but.style.left = "" + this.x + "px";
-	but.style.top = "" + this.y + "px";
   }
 };
 }}$;
 ${{
 Div.prototype.toString = function() {
-  return "Div(" + this.name + ", " + this.x + ", "+this.y+", ...)";
+  return "Div(\"" + this.name + "\", " + this.x + ", "+this.y+", "+this.width+", "+this.height+", \""+this.style+"\")";
 };
 }}$;
 
@@ -462,4 +467,5 @@ Image.prototype.toString = function() {
   return "Image(" + this.name + ", " + this.x + ", "+this.y+", ...)";
 };
 }}$;
+
 

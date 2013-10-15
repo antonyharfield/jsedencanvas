@@ -1,0 +1,69 @@
+## Define the 4 circles
+circCurrent = "";
+circRadius = 30;
+circB1_x = 70;
+circB1_y = 50;
+circB1 is Circle(circB1_x,circB1_y,circRadius,"blue",circCurrent == "B1" ? "red" : "black");
+circB2_x = 220;
+circB2_y = 50;
+circB2 is Circle(circB2_x,circB2_y,circRadius,"blue",circCurrent == "B2" ? "red" : "black");
+circY1_x = 370;
+circY1_y = 50;
+circY1 is Circle(circY1_x,circY1_y,circRadius,"yellow",circCurrent == "Y1" ? "red" : "black");
+circY2_x = 520;
+circY2_y = 50;
+circY2 is Circle(circY2_x,circY2_y,circRadius,"yellow",circCurrent == "Y2" ? "red" : "black");
+
+## Whenever there is a mouse click, check if it is a click on a circle or a click in space.
+proc mouseClicked : mouseDown {
+	if (mouseDown == 0) return;
+	if (mouseX > circB1.x - circB1.radius && mouseX < circB1.x + circB1.radius && mouseY > circB1.y - circB1.radius && mouseY < circB1.y + circB1.radius)
+		circCurrent = "B1";
+	else if (mouseX > circB2.x - circB2.radius && mouseX < circB2.x + circB2.radius && mouseY > circB2.y - circB2.radius && mouseY < circB2.y + circB2.radius)
+		circCurrent = "B2";
+	else if (mouseX > circY1.x - circY1.radius && mouseX < circY1.x + circY1.radius && mouseY > circY1.y - circY1.radius && mouseY < circY1.y + circY1.radius)
+		circCurrent = "Y1";
+	else if (mouseX > circY2.x - circY2.radius && mouseX < circY2.x + circY2.radius && mouseY > circY2.y - circY2.radius && mouseY < circY2.y + circY2.radius)
+		circCurrent = "Y2";
+	else if (circCurrent != "") {
+		if (circCurrent == "B1") {
+			circB1_x = mouseX;
+			circB1_y = mouseY;
+		}
+		else if (circCurrent == "B2") {
+			circB2_x = mouseX;
+			circB2_y = mouseY;
+		}
+		else if (circCurrent == "Y1") {
+			circY1_x = mouseX;
+			circY1_y = mouseY;
+		}
+		else if (circCurrent == "Y2") {
+			circY2_x = mouseX;
+			circY2_y = mouseY;
+		}
+	}
+}
+
+## Define the rectangle
+rectX = 250;
+rectY = 150;
+rectWidth = 300;
+rectHeight = 200;
+rect is Rectangle(rectX,rectY,rectWidth,rectHeight, isComplete ? "grey" : "white");
+
+## Detemine which circles are inside the rect
+circB1_inside is circB1_x > rectX && circB1_x < rectX+rectWidth && circB1_y > rectY && circB1_y < rectY+rectHeight;
+circB2_inside is circB2_x > rectX && circB2_x < rectX+rectWidth && circB2_y > rectY && circB2_y < rectY+rectHeight;
+circY1_inside is circY1_x > rectX && circY1_x < rectX+rectWidth && circY1_y > rectY && circY1_y < rectY+rectHeight;
+circY2_inside is circY2_x > rectX && circY2_x < rectX+rectWidth && circY2_y > rectY && circY2_y < rectY+rectHeight;
+
+## Only complete when either two blue circles inside the rect or two yellow circles
+isComplete is (circB1_inside && circB2_inside && !circY1_inside && !circY2_inside) || 
+			(!circB1_inside && !circB2_inside && circY1_inside && circY2_inside);
+
+
+canvas is [rect, circB1, circB2, circY1, circY2];
+
+
+

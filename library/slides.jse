@@ -1,0 +1,90 @@
+
+## Slide
+${{
+Slide = function (html) {
+    this.html = html;
+}
+}}$;
+
+func Slide { ${{
+    var html = arguments[0];
+    return new Slide(html);
+}}$; }
+
+${{
+
+Slide.prototype.draw = function() {
+  var content = this.html.replace(/<jseden>/g,"<div><pre>").replace(/<\/jseden>/g,"</pre><a href=\"#\" onclick=\"Slide.execute(this)\">execute</a> <a href=\"#\" onclick=\"Slide.copyToInput(this)\">copy to input</a><br /></div>");
+  $('#slides').html(content);
+};
+Slide.prototype.toString = function() {
+  return "Slide("+this.html+")";
+};
+
+Slide.clear = function() {
+  $('#slides').html('');
+};
+Slide.copyToInput = function(e) {
+	$("#inputbox").click();
+	// Copies to EDEN interpreter window
+	inputBox.setValue($(e).siblings('pre').html());
+};
+Slide.execute = function(e) {
+	// Evaluates and stores in the symbol table
+	eval(Eden.translateToJavaScript($(e).siblings('pre').html()));
+};
+
+}}$;
+
+
+slides is [];
+currentSlide = 0;
+
+proc drawSlides : slides, currentSlide {
+  ${{
+  var slides = context.lookup('slides').value();
+  var currentSlide = context.lookup('currentSlide').value();
+  if (slides === undefined || !isArray(slides) || slides.length == 0 || currentSlide === undefined || currentSlide >= slides.length) {
+	Slide.clear();
+ 	return;
+  }
+
+  slides[currentSlide].draw();
+
+  }}$;
+};
+
+${{
+$('#slides').hover(
+  function () {
+	var buttons = $("<div id=\"buttons\" style=\"position:absolute\">").hide().appendTo('#slides');
+	buttons.css('right','10px');
+	buttons.css('bottom','134px');
+	buttons.css('font-size','80%');
+	buttons.css('color','rgb(38,70,166)');
+	var buttonNext = $('<span>Next &gt;</span>').css('cursor','pointer').click(function() {
+		context.lookup('currentSlide').assign(context.lookup('currentSlide').value()+1);
+	});
+	var buttonPrev = $('<span>&lt; Prev</span>').css('cursor','pointer').click(function() {
+		context.lookup('currentSlide').assign(currentSlide-1);
+	});
+	var currentSlide = context.lookup('currentSlide').value();
+	if (currentSlide > 0)
+		buttons.append(buttonPrev);
+	buttons.append("&nbsp;");
+	var noOfSlides = context.lookup('slides').value().length;
+	if (noOfSlides !== undefined && currentSlide < noOfSlides-1)
+		buttons.append(buttonNext);
+    //$(this).append($("<div id=\"buttons\" style=\"position:absolute; right:10px; bottom:5px\"><a href=\"#\" onclick=\"slidePrev\">&lt; Prev</a> <a href=\"#\" onclick=\"slideNext\">Next ></a></div>").hide());
+	buttons.fadeIn();
+  }, 
+  function () {
+    $(this).find("#buttons").remove();
+  }
+);
+
+}}$;
+
+proc showSlides {
+	${{ showSlides(); }}$;
+}

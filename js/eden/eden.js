@@ -193,22 +193,68 @@ Eden.parserWithInitialisation = function parserWithInitialisation(parser) {
 // XXX: require.js for loading eden/parser.js
 Eden.translateToJavaScript = Eden.parserWithInitialisation(parser);
 
-Eden.prototype.getDefinition = function(name, symbol) {
+Eden.prototype.getDefinition = function(name) {
+	var symbol = this.context.lookup(name);
 	if (symbol.eden_definition) {
 		return symbol.eden_definition + ";";
-	} else {
-		return name + " = " + symbol.cached_value + ";";
 	}
+	return name + " = " + this.getSymbolValue(symbol) + ";";
 };
+
+Eden.prototype.getSymbolValue = function(symbol) {
+	var valText;
+	if (typeof symbol != "object" || symbol.constructor.name != "Symbol") {
+		if (isArray(symbol)) {
+			valText = "[";
+			for (var i=0; i<symbol.length; i++) {
+				if (i != 0)
+					valText = valText + ", ";
+				valText = valText + this.getSymbolValue(symbol[i]);
+			}
+			valText = valText + "]";
+		}
+		else if (typeof symbol == "string")
+			valText = "\""+symbol+"\"";
+		else
+			valText = symbol;
+	}
+	else if (typeof symbol.value() == "boolean") {
+		valText = symbol.cached_value;
+	}
+	else if (typeof symbol.value() == "undefined") {
+		valText = "undefined";
+	}
+	else if (typeof symbol.value() == "string") {
+		valText = "\""+symbol.cached_value+"\"";
+	}
+	else if (typeof symbol.value() == "number") {
+		valText = symbol.cached_value;
+	}
+	else if (isArray(symbol.value())) {
+		// Loop over list
+		valText = "[";
+		for (var i=0; i<symbol.value().length; i++) {
+			if (i != 0)
+				valText = valText + ", ";
+			valText = valText + this.getSymbolValue(symbol.value()[i]);
+		}
+		valText = valText + "]";
+	}
+	else if (typeof symbol.value() == "object") { valText = "object"; }
+	else { valText = "unknown"; }
+	
+	return valText;
+}
 
 /*
  * XXX: all this stuff currently isn't used, just represents
  * some hacking for persisting model state I did. monk
+ * Actually, it works! ant
  */
 Eden.prototype.getSerializedState = function() {
 	var script = "";
 	for (var name in this.context.symbols) {
-		script += this.getDefinition(name, this.context.symbols[name]) + "\n";
+		script += this.getDefinition(name) + "\n";
 	}
 	return script;
 };
@@ -222,8 +268,6 @@ Eden.prototype.loadLocalModelState = function() {
 	var stored_script = localStorage[this.storage_script_key];
 	if (stored_script != undefined) {
 		eval(Eden.translateToJavaScript(stored_script));
-	} else {
-		console.log("tried to load local model state but there was nothing stored!");
 	}
 };
 
